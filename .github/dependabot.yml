@@ -1,0 +1,18 @@
+# Atualizações semanais do uv.lock e das actions do CI. O cooldown faz o
+# Dependabot esperar 7 dias depois de uma versão sair antes de propô-la,
+# para não adotar uma release comprometida no dia em que ela é publicada.
+version: 2
+updates:
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7

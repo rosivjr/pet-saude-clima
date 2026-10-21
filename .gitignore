@@ -1,0 +1,36 @@
+# Ambiente
+.venv/
+__pycache__/
+*.py[cod]
+
+# Ferramentas
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+
+# Dados: nunca versionar (inclui SISAGUA, Censo, SINISA e chuva baixada)
+data/
+*.csv
+*.parquet
+*.dbc
+*.xlsx
+*.pdf
+
+# Saídas geradas (relatório, log, proveniência, figuras)
+outputs/
+figuras/
+relatorio.txt
+*.log
+
+# Segredos
+.env*
+
+*.bak
+
+# Rascunhos e testes de conexão, fora do repositório
+rascunhos/

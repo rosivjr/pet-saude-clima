@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0  # o Gitleaks percorre todo o histórico
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7  # v10.2.0
+        with:
+          version: "0.13.1"
+          python-version: "3.12"
+
+      - name: Dependências do uv.lock
+        run: uv sync --locked
+
+      - name: Ruff
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Testes
+        run: uv run pytest --cov=src
+
+      # Ignorados temporariamente: as correções saíram há menos de 7 dias, e o
+      # projeto espera o cooldown do Dependabot antes de adotar versão nova
+      # (docs/seguranca.md). Data da correção = publicação no PyPI (UTC).
+      # Remover cada --ignore-vuln até a data limite, com a atualização.
+      #   ID                   pacote   correção     publicada   remover até
+      #   GHSA-6q48-6c7w-9gw2  certifi  2026.10.19   20/10/2026  27/10/2026
+      #   CVE-2026-112395      pillow   13.0.0       16/10/2026  23/10/2026
+      #   CVE-2026-112397      pillow   13.0.0       16/10/2026  23/10/2026
+      #   CVE-2026-112400      pillow   13.0.0       16/10/2026  23/10/2026
+      #   CVE-2026-112404      pillow   13.0.0       16/10/2026  23/10/2026
+      #   CVE-2026-112895      pillow   13.0.0       16/10/2026  23/10/2026
+      #   CVE-2026-112896      pillow   13.0.0       16/10/2026  23/10/2026
+      #   CVE-2026-112897      pillow   13.0.0       16/10/2026  23/10/2026
+      #   CVE-2026-112899      pillow   13.0.0       16/10/2026  23/10/2026
+      # Em 20/10/2026 não havia pillow 12.x corrigido (a última 12.x é a 12.3.0,
+      # afetada). Se sair uma 12.x corrigida, a atualização deve preferi-la à 13.
+      - name: Vulnerabilidades conhecidas
+        run: >-
+          uv run pip-audit --skip-editable
+          --ignore-vuln GHSA-6q48-6c7w-9gw2
+          --ignore-vuln CVE-2026-112395
+          --ignore-vuln CVE-2026-112397
+          --ignore-vuln CVE-2026-112400
+          --ignore-vuln CVE-2026-112404
+          --ignore-vuln CVE-2026-112895
+          --ignore-vuln CVE-2026-112896
+          --ignore-vuln CVE-2026-112897
+          --ignore-vuln CVE-2026-112899
+
+      # Binário oficial do Gitleaks, a mesma versão do pre-commit. O tarball é
+      # conferido contra o checksums.txt da release e contra o hash fixo aqui,
+      # que não muda se a release for adulterada.
+      - name: Gitleaks
+        env:
+          VERSAO: "8.30.1"
+          SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+        run: |
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${VERSAO}"
+          arquivo="gitleaks_${VERSAO}_linux_x64.tar.gz"
+          curl -sSfL -o "$RUNNER_TEMP/$arquivo" "$base/$arquivo"
+          curl -sSfL -o "$RUNNER_TEMP/checksums.txt" "$base/gitleaks_${VERSAO}_checksums.txt"
+          cd "$RUNNER_TEMP"
+          grep " ${arquivo}\$" checksums.txt | sha256sum -c -
+          echo "${SHA256}  ${arquivo}" | sha256sum -c -
+          tar -xzf "$arquivo" gitleaks
+          ./gitleaks git --redact --no-banner "$GITHUB_WORKSPACE"

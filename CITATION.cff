@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "Se usar este código ou estes resultados, cite como abaixo."
+title: "Agravos relacionados à água e qualidade da água em Parauapebas (PA) — PET-Saúde CLIMA, Eixo II"
+type: software
+authors:
+  - family-names: Soares
+    given-names: Rosival
+repository-code: "https://github.com/rosivjr/pet-saude-clima"
+license: MIT
+keywords:
+  - DRSAI
+  - qualidade da água
+  - SISAGUA
+  - SIH/SUS
+  - SINAN
+  - estudo ecológico
+  - Parauapebas
