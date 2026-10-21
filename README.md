@@ -263,10 +263,9 @@ primeira versão arquivada.
 
 ## Licença
 
-Código sob a licença MIT; documentação e figuras sob CC BY 4.0. Ambas estão
-sujeitas ao aval da coordenação. Texto completo em [`LICENSE`](LICENSE). Os
-dados brutos não fazem parte do repositório e seguem as condições de cada
-fonte.
+Código sob a licença MIT; documentação e figuras sob CC BY 4.0. Texto
+completo em [`LICENSE`](LICENSE). Os dados brutos não fazem parte do
+repositório e seguem as condições de cada fonte.
 
 ## Financiamento
 
